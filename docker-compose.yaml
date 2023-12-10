@@ -1,0 +1,39 @@
+version: "3"
+services:
+  mysql-service:
+    image: localhost:5000/registry-mysql-image:latest
+    container_name: mysql-service
+    ports:
+      - 3309:3306
+    volumes:
+      - mysqlvol:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+    networks:
+      - appnetwork
+  backend-service:
+    image: localhost:5000/registry-backend-image:1.0.0
+    container_name: backend-service
+    ports:
+      - 8080:8080
+    networks:
+      - appnetwork
+    depends_on:
+      - mysql-service
+  frontend-service:
+    image:  localhost:5000/registry-frontend-image:1.0.0
+    container_name: frontend-service
+    ports:
+      - 8081:80
+    networks:
+      - appnetwork
+    depends_on:
+      - backend-service
+
+networks:
+  appnetwork:
+    driver: bridge
+volumes:
+  mysqlvol:
+    driver: local
